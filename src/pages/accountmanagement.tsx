@@ -8,16 +8,18 @@ const AccountManagementPage: FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>("PendingApproval");
 
   useEffect(() => {
-    (async () => {
+    let subscription: any;
+
+    const fetchOrders = async () => {
       const { data } = await supabase.from("Orders").select();
       const orderData: any[] = [];
 
-      const { data: customersData, error: customersError } = await supabase
+      const { data: customersData } = await supabase
         .from("Customers")
         .select("id, name");
       const customerMap = new Map(customersData!.map((c) => [c.id, c.name]));
 
-      const { data: productsData, error: productsError } = await supabase
+      const { data: productsData } = await supabase
         .from("Products")
         .select("id, productName");
       const productMap = new Map(
@@ -36,7 +38,29 @@ const AccountManagementPage: FC = () => {
       });
 
       setOrders(orderData);
-    })();
+    };
+
+    fetchOrders(); // initial load
+
+    subscription = supabase
+      .channel("orders-updates")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "Orders",
+        },
+        (payload) => {
+          console.log("Realtime update:", payload);
+          fetchOrders();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
   }, []);
 
   const filteredOrders = orders?.filter((order) => {

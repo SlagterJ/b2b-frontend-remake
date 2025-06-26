@@ -100,7 +100,9 @@ const ProductionLineView: FC<ProductionLineViewProps> = ({
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
 
   useEffect(() => {
-    (async () => {
+    let subscription: any;
+
+    const fetchData = async () => {
       const { data, error } = await supabase
         .from("WorkOrders")
         .select(
@@ -123,7 +125,29 @@ const ProductionLineView: FC<ProductionLineViewProps> = ({
       }
 
       setWorkOrders(data as WorkOrder[]);
-    })();
+    };
+
+    fetchData();
+
+    subscription = supabase
+      .channel("workorders-channel")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "Orders",
+        },
+        (payload) => {
+          console.log("Realtime payload:", payload);
+          fetchData(); // refresh the list
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
   }, [selectedProductionLineId]);
 
   const dataSource = workOrders.map((workOrder) => ({

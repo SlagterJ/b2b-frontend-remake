@@ -1,14 +1,29 @@
 ﻿import { FC, useEffect, useState } from "react";
-import { Button, Checkbox, Modal, Space, Table, Typography } from "antd";
+import {
+  Button,
+  Checkbox,
+  Dropdown,
+  Form,
+  InputNumber,
+  MenuProps,
+  Modal,
+  Space,
+  Table,
+  Typography,
+} from "antd";
 import { supabase } from "../global/initSupabase";
 
 const PlanningPage: FC = () => {
+  const [form] = Form.useForm();
   const [orders, setOrders] = useState<any[] | undefined>(undefined);
   const [statusFilter, setStatusFilter] = useState<string>("Planning");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
   const [selectedLine, setSelectedLine] = useState<string | null>(null);
   const [productionLines, setProductionLines] = useState<any[]>([]);
+  const [selectedProductionLineId, setSelectedProductionLineId] = useState<
+    string | null
+  >();
 
   useEffect(() => {
     (async () => {
@@ -58,13 +73,50 @@ const PlanningPage: FC = () => {
     else setProductionLines(data);
   };
 
-  const handleModalOk = () => {
-    setIsModalVisible(false);
-    setSelectedOrder(null);
-    setSelectedLine(null);
+  const handleSubmit = (values: any) => {
+    (async () => {
+      const { data, error: workOrderError } = await supabase
+        .from("WorkOrders")
+        .insert([
+          {
+            orderId: selectedOrder.key,
+            plannedPeriod: values.period,
+            productionLineId: selectedProductionLineId,
+          },
+        ])
+        .select();
+
+      if (workOrderError) {
+        console.error("Error inserting work order", workOrderError);
+        return;
+      }
+
+      if (!data || data.length <= 0) {
+        console.error("Data length is", data.length);
+        return;
+      }
+
+      const { error: purchaseOrderError } = await supabase
+        .from("PurchaseOrders")
+        .insert([{ orderPeriod: values.period, workOrderId: data[0].id }]);
+
+      if (purchaseOrderError) {
+        console.error(purchaseOrderError);
+        return;
+      }
+    })();
+
+    console.table(values);
+    form.resetFields();
+    setSelectedProductionLineId(null);
+    handleModalClose();
   };
 
-  const handleModalCancel = () => {
+  const handleModalOk = () => {
+    form.submit();
+  };
+
+  const handleModalClose = () => {
     setIsModalVisible(false);
     setSelectedOrder(null);
     setSelectedLine(null);
@@ -112,6 +164,22 @@ const PlanningPage: FC = () => {
     },
   ];
 
+  const handleMenuClick: MenuProps["onClick"] = (info) => {
+    setSelectedProductionLineId(info.key);
+    form.setFieldsValue({ productionLine: info.key });
+  };
+
+  const menuItems: MenuProps["items"] = productionLines.map(
+    (productionLine) => ({
+      key: productionLine.id,
+      label: productionLine.name,
+    }),
+  );
+
+  const selectedProductionLine = productionLines.find(
+    (productionLine) => productionLine.id === selectedProductionLineId,
+  );
+
   return (
     <Space>
       <Table dataSource={filteredOrders} columns={columns} />
@@ -119,7 +187,7 @@ const PlanningPage: FC = () => {
         title="Order plannen"
         open={isModalVisible}
         onOk={handleModalOk}
-        onCancel={handleModalCancel}
+        onCancel={handleModalClose}
       >
         {selectedOrder && (
           <>
@@ -140,19 +208,45 @@ const PlanningPage: FC = () => {
             </p>
             <div>
               <p>
-                <strong>Productielijnen:</strong>
+                <strong>Verder benodigde informatie:</strong>
               </p>
-              <Space direction="vertical">
-                {productionLines.map((line) => (
-                  <Checkbox
-                    key={line.id}
-                    checked={selectedLine === line.id}
-                    onChange={() => setSelectedLine(line.id)}
+              <Form form={form} onFinish={handleSubmit}>
+                <Form.Item
+                  label="Productielijn"
+                  name="productionLine"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Kies a.u.b. een productielijn",
+                    },
+                  ]}
+                >
+                  <Dropdown
+                    menu={{
+                      items: menuItems,
+                      onClick: handleMenuClick,
+                    }}
                   >
-                    {line.name}
-                  </Checkbox>
-                ))}
-              </Space>
+                    <Button>
+                      {selectedProductionLine
+                        ? selectedProductionLine.name
+                        : "Kies uw gewenste productielijn ↓"}
+                    </Button>
+                  </Dropdown>
+                </Form.Item>
+                <Form.Item
+                  label="Geplande periode"
+                  name="period"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vul a.u.b. de huidige periode in",
+                    },
+                  ]}
+                >
+                  <InputNumber min={1} max={80} />
+                </Form.Item>
+              </Form>
             </div>
           </>
         )}

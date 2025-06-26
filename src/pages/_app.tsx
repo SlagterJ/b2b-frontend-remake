@@ -85,7 +85,12 @@ const MyApp: FC<AppProps> = ({ Component, pageProps }: AppProps) => {
       <App>
         <Layout style={{ minHeight: "100vh", margin: 0 }}>
           <Sider>
-            <Menu mode="inline" items={menuItems} onClick={handleMenuClick} />
+            <Menu
+              style={{ height: "100%" }}
+              mode="inline"
+              items={menuItems}
+              onClick={handleMenuClick}
+            />
           </Sider>
           <Content>
             <Layout

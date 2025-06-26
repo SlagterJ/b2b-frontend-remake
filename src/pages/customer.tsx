@@ -66,6 +66,7 @@ const OrderForm: FC<OrderFormProps> = ({ customerId }) => {
           customerId: customerId,
           productId: values.product,
           productQuantity: values.quantity,
+          orderPeriod: values.period,
         },
       ]);
 
@@ -102,6 +103,15 @@ const OrderForm: FC<OrderFormProps> = ({ customerId }) => {
         rules={[{ required: true, message: "Vul a.u.b. het aantal in" }]}
       >
         <InputNumber min={1} max={3} />
+      </Form.Item>
+      <Form.Item
+        label="Periode"
+        name="period"
+        rules={[
+          { required: true, message: "Vul a.u.b. de huidige periode in" },
+        ]}
+      >
+        <InputNumber min={1} max={80} />
       </Form.Item>
 
       <Form.Item label={null}>
@@ -159,9 +169,9 @@ const CustomerPage: FC = () => {
           </Button>
         </Dropdown>
 
-        {selectedCustomerId && (
+        {selectedCustomer && (
           <Typography style={{ marginTop: 16 }}>
-            Geselecteerde klant ID: <strong>{selectedCustomerId}</strong>
+            Goedendag, <strong>{selectedCustomer.name}</strong>
           </Typography>
         )}
       </Content>

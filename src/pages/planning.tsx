@@ -75,6 +75,21 @@ const PlanningPage: FC = () => {
 
   const handleSubmit = (values: any) => {
     (async () => {
+      const { error: updateOrderError } = await supabase
+        .from("Orders")
+        .update({
+          status: "WaitingForParts",
+        })
+        .eq("id", selectedOrder.key);
+
+      if (updateOrderError) {
+        console.error(
+          "There was a problem with updating the status of the order",
+          updateOrderError,
+        );
+        return;
+      }
+
       const { data, error: workOrderError } = await supabase
         .from("WorkOrders")
         .insert([

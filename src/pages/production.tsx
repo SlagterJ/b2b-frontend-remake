@@ -124,7 +124,11 @@ const ProductionLineView: FC<ProductionLineViewProps> = ({
         return;
       }
 
-      setWorkOrders(data as WorkOrder[]);
+      const filteredData = (data as WorkOrder[]).filter(
+        (workOrder) => workOrder.Orders !== null,
+      );
+
+      setWorkOrders(filteredData);
     };
 
     fetchData();

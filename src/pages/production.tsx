@@ -79,6 +79,7 @@ const ProductionPage: FC = () => {
 interface WorkOrder {
   id: number;
   Orders: {
+    id: number;
     productQuantity: number;
     Products: {
       productName: string;
@@ -132,7 +133,24 @@ const ProductionLineView: FC<ProductionLineViewProps> = ({
     blueBlocks: workOrder.Orders.Products.blueBlocks,
     redBlocks: workOrder.Orders.Products.redBlocks,
     greyBlocks: workOrder.Orders.Products.greyBlocks,
+    orderId: workOrder.Orders.id,
   }));
+
+  const handleStatusUpdate = async (
+    orderId: string,
+    currentStatus: string,
+    selectedStatus: string,
+  ) => {
+    const { error } = await supabase
+      .from("Orders")
+      .update({ status: selectedStatus })
+      .eq("id", orderId);
+
+    if (error) {
+      console.error("Failed to update status:", error);
+      return;
+    }
+  };
 
   const columns = [
     {
@@ -166,8 +184,27 @@ const ProductionLineView: FC<ProductionLineViewProps> = ({
       render: (_: any, record: any) => {
         return (
           <Space>
-            <Button>Gemaakt</Button>
-            <Button>Afwijzen</Button>
+            <Button
+              type={"default"}
+              onClick={() =>
+                handleStatusUpdate(
+                  record.orderId,
+                  record.status,
+                  "ReadyForDelivery",
+                )
+              }
+            >
+              Klaar
+            </Button>
+            <Button
+              type={"default"}
+              danger
+              onClick={() =>
+                handleStatusUpdate(record.orderId, record.status, "Planning")
+              }
+            >
+              Afwijzen
+            </Button>
           </Space>
         );
       },

@@ -10,11 +10,9 @@ import {
   AuditOutlined,
   BuildOutlined,
   CalendarOutlined,
-  FundViewOutlined,
   MonitorOutlined,
-  StockOutlined,
-  TagsOutlined,
   TeamOutlined,
+  TruckOutlined,
 } from "@ant-design/icons";
 import router from "next/router";
 
@@ -46,7 +44,7 @@ const MyApp: FC<AppProps> = ({ Component, pageProps }: AppProps) => {
     },
     {
       key: "supplier",
-      icon: <FundViewOutlined />,
+      icon: <TruckOutlined />,
       label: "Leverancier",
     },
     /*

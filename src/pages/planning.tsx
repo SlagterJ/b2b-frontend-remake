@@ -26,16 +26,18 @@ const PlanningPage: FC = () => {
   >();
 
   useEffect(() => {
-    (async () => {
+    let subscription: any;
+
+    const fetchOrders = async () => {
       const { data } = await supabase.from("Orders").select();
       const orderData: any[] = [];
 
-      const { data: customersData, error: customersError } = await supabase
+      const { data: customersData } = await supabase
         .from("Customers")
         .select("id, name");
       const customerMap = new Map(customersData!.map((c) => [c.id, c.name]));
 
-      const { data: productsData, error: productsError } = await supabase
+      const { data: productsData } = await supabase
         .from("Products")
         .select("id, productName");
       const productMap = new Map(
@@ -54,7 +56,28 @@ const PlanningPage: FC = () => {
       });
 
       setOrders(orderData);
-    })();
+    };
+
+    fetchOrders(); // Initial fetch
+
+    subscription = supabase
+      .channel("orders-updates")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "Orders",
+        },
+        () => {
+          fetchOrders(); // Re-fetch on any insert/update/delete
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
   }, []);
 
   const filteredOrders = orders?.filter((order) => {

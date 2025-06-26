@@ -74,12 +74,21 @@ const MyApp: FC<AppProps> = ({ Component, pageProps }: AppProps) => {
   return (
     <Provider store={store}>
       <App>
-        <Layout style={{ minHeight: "100vh" }}>
+        <Layout style={{ minHeight: "100vh", margin: 0 }}>
           <Sider>
-            <Menu items={menuItems} onClick={handleMenuClick} />
+            <Menu mode="inline" items={menuItems} onClick={handleMenuClick} />
           </Sider>
           <Content>
-            <Component {...pageProps} />
+            <Layout
+              style={{
+                margin: "10px",
+                padding: "24px",
+                backgroundColor: "white",
+                borderRadius: "20px",
+              }}
+            >
+              <Component {...pageProps} />
+            </Layout>
           </Content>
         </Layout>
       </App>

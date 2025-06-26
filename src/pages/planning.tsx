@@ -12,6 +12,7 @@ import {
   Typography,
 } from "antd";
 import { supabase } from "../global/initSupabase";
+import { Content } from "antd/es/layout/layout";
 
 const PlanningPage: FC = () => {
   const [form] = Form.useForm();
@@ -219,7 +220,7 @@ const PlanningPage: FC = () => {
   );
 
   return (
-    <Space>
+    <Content>
       <Table dataSource={filteredOrders} columns={columns} />
       <Modal
         title="Order plannen"
@@ -289,7 +290,7 @@ const PlanningPage: FC = () => {
           </>
         )}
       </Modal>
-    </Space>
+    </Content>
   );
 };
 

@@ -1,0 +1,9 @@
+﻿.github/
+.idea/
+.next/
+node_modules/
+cache/
+
+.gitignore
+next-env.d.ts
+yarn.lock

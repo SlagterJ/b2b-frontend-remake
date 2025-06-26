@@ -34,15 +34,11 @@ const MyApp: FC<AppProps> = ({ Component, pageProps }: AppProps) => {
       label: "Klant",
     },
     {
-      key: "production",
-      icon: <BuildOutlined />,
-      label: "Productie",
-    },
-    {
       key: "accountmanagement",
       icon: <AuditOutlined />,
       label: "Account management",
     },
+
     {
       key: "planning",
       icon: <CalendarOutlined />,
@@ -53,21 +49,30 @@ const MyApp: FC<AppProps> = ({ Component, pageProps }: AppProps) => {
       icon: <FundViewOutlined />,
       label: "Leverancier",
     },
+    /*
     {
       key: "inventorymanagement",
       icon: <TagsOutlined />,
       label: "Voorraadbeheer",
+    },
+     */
+    {
+      key: "production",
+      icon: <BuildOutlined />,
+      label: "Productie",
     },
     {
       key: "expedition",
       icon: <MonitorOutlined />,
       label: "Expeditie",
     },
+    /*
     {
       key: "financialadmin",
       icon: <StockOutlined />,
       label: "Financiële administratie",
     },
+     */
   ];
 
   const handleMenuClick = useCallback(

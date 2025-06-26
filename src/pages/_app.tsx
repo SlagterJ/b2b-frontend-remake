@@ -14,6 +14,7 @@ import {
   MonitorOutlined,
   StockOutlined,
   TagsOutlined,
+  TeamOutlined,
 } from "@ant-design/icons";
 import router from "next/router";
 
@@ -26,6 +27,11 @@ const MyApp: FC<AppProps> = ({ Component, pageProps }: AppProps) => {
       key: "/",
       icon: <AppstoreOutlined />,
       label: "Dashboard",
+    },
+    {
+      key: "customer",
+      icon: <TeamOutlined />,
+      label: "Klant",
     },
     {
       key: "production",

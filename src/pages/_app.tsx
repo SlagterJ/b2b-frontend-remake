@@ -5,7 +5,7 @@ import {AppProps} from "next/app";
 import {App, Layout, Menu} from "antd";
 import {Content} from "antd/lib/layout/layout";
 import Sider from "antd/es/layout/Sider";
-import {AuditOutlined, BuildOutlined, CalendarOutlined, EuroCircleOutlined, HomeOutlined} from "@ant-design/icons";
+import {AppstoreOutlined, AuditOutlined, BuildOutlined, CalendarOutlined, EuroCircleOutlined, HomeOutlined} from "@ant-design/icons";
 
 /**
  * Default app component. This component renders and wraps around every page.
@@ -13,9 +13,9 @@ import {AuditOutlined, BuildOutlined, CalendarOutlined, EuroCircleOutlined, Home
 const MyApp: FC<AppProps> = ({Component, pageProps}: AppProps) => {
   const menuItems = [
     {
-      key: "home",
-      icon: <HomeOutlined/>,
-      label: "Home",
+      key: "dashboard",
+      icon: <AppstoreOutlined/>,
+      label: "Dashboard",
     },
     {
       key: "production",

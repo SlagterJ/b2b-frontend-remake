@@ -1,12 +1,12 @@
 ﻿import { FC } from "react";
 import { Space, Typography } from "antd";
 
-const HomePage: FC = () => {
+const PlanningPage: FC = () => {
   return (
     <Space>
-      <Typography>Hello, World!</Typography>
+      <Typography>Hello, planning!</Typography>
     </Space>
   );
 };
 
-export default HomePage;
+export default PlanningPage;

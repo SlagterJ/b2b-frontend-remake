@@ -16,7 +16,7 @@
     "jsx": "preserve",
     "baseUrl": "src",
     "paths": {
-      "@redux-typed-hooks": ["state/hooks"],
+      "@redux-typed-hooks": ["state/hooks"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

@@ -1,73 +1,82 @@
-﻿import {Provider} from "react-redux";
+﻿import { Provider } from "react-redux";
 import store from "../state/store";
-import {FC} from "react";
-import {AppProps} from "next/app";
-import {App, Layout, Menu} from "antd";
-import {Content} from "antd/lib/layout/layout";
+import { FC, useCallback } from "react";
+import { AppProps } from "next/app";
+import { App, Layout, Menu } from "antd";
+import { Content } from "antd/lib/layout/layout";
 import Sider from "antd/es/layout/Sider";
 import {
   AppstoreOutlined,
   AuditOutlined,
   BuildOutlined,
   CalendarOutlined,
-  FundViewOutlined, MonitorOutlined, StockOutlined,
+  FundViewOutlined,
+  MonitorOutlined,
+  StockOutlined,
   TagsOutlined,
 } from "@ant-design/icons";
+import router from "next/router";
 
 /**
  * Default app component. This component renders and wraps around every page.
  */
-const MyApp: FC<AppProps> = ({Component, pageProps}: AppProps) => {
+const MyApp: FC<AppProps> = ({ Component, pageProps }: AppProps) => {
   const menuItems = [
     {
-      key: "dashboard",
-      icon: <AppstoreOutlined/>,
+      key: "/",
+      icon: <AppstoreOutlined />,
       label: "Dashboard",
     },
     {
       key: "production",
-      icon: <BuildOutlined/>,
+      icon: <BuildOutlined />,
       label: "Productie",
     },
     {
       key: "accountmanagement",
-      icon: <AuditOutlined/>,
+      icon: <AuditOutlined />,
       label: "Account management",
     },
     {
       key: "planning",
-      icon: <CalendarOutlined/>,
+      icon: <CalendarOutlined />,
       label: "Planning",
     },
     {
       key: "purchasing",
-      icon: <FundViewOutlined/>,
+      icon: <FundViewOutlined />,
       label: "Inkoop",
     },
     {
       key: "inventorymanagement",
-      icon: <TagsOutlined/>,
+      icon: <TagsOutlined />,
       label: "Voorraadbeheer",
     },
     {
       key: "expedition",
-      icon: <MonitorOutlined/>,
+      icon: <MonitorOutlined />,
       label: "Expeditie",
     },
     {
       key: "financialadmin",
-      icon: <StockOutlined/>,
+      icon: <StockOutlined />,
       label: "Financiële administratie",
     },
   ];
 
+  const handleMenuClick = useCallback(
+    ({ key }: { key: string }) => {
+      router.push(key);
+    },
+    [router],
+  );
 
   return (
     <Provider store={store}>
       <App>
-        <Layout>
+        <Layout style={{ minHeight: "100vh" }}>
           <Sider>
-            <Menu items={menuItems}/>
+            <Menu items={menuItems} onClick={handleMenuClick} />
           </Sider>
           <Content>
             <Component {...pageProps} />

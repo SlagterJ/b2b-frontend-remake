@@ -1,6 +1,6 @@
 ﻿import { FC, useEffect, useState } from "react";
 import { Content } from "antd/lib/layout/layout";
-import { Dropdown } from "antd";
+import { Dropdown, Spin } from "antd";
 import { supabase } from "../global/initSupabase";
 
 const CustomerPage: FC = () => {
@@ -21,9 +21,9 @@ const CustomerPage: FC = () => {
 
   return (
     <Content>
-      {customers && (
-        <Dropdown menu={{ items: customers }}>Kies uw naam</Dropdown>
-      )}
+      <Dropdown menu={{ items: customers ? customers : [<Spin />] }}>
+        Kies uw naam V
+      </Dropdown>
     </Content>
   );
 };

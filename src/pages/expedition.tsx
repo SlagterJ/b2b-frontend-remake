@@ -1,5 +1,5 @@
 ﻿import { FC, useEffect, useState } from "react";
-import { Button, Space, Table, Typography } from "antd";
+import { Button, Form, InputNumber, Space, Table, Typography } from "antd";
 import { supabase } from "../global/initSupabase";
 
 interface WorkOrder {
@@ -126,16 +126,56 @@ const ExpeditionPage: FC = () => {
       title: "Acties",
       key: "actions",
       render: (_: any, record: any) => {
+        const handleSubmit = (values: any) => {
+          (async () => {
+            const { error: orderError } = await supabase
+              .from("Orders")
+              .update({ deliveredPeriod: values.period })
+              .eq("id", record.orderId);
+
+            if (orderError) {
+              console.error(
+                "There was an error updating the order",
+                orderError,
+              );
+              return;
+            }
+
+            const { error: updateOrderError } = await supabase
+              .from("Orders")
+              .update({
+                status: "Delivered",
+              })
+              .eq("id", record.orderId);
+
+            if (updateOrderError) {
+              console.error(
+                "There was an error updating the order status",
+                updateOrderError,
+              );
+              return;
+            }
+          })();
+        };
+
         return (
           <Space>
-            <Button
-              type={"default"}
-              onClick={() =>
-                handleStatusUpdate(record.orderId, record.status, "Delivered")
-              }
-            >
-              Bezorgd
-            </Button>
+            <Form onFinish={handleSubmit}>
+              <Form.Item
+                label="Periode"
+                name="period"
+                rules={[
+                  { required: true, message: "Vul a.u.b de periode in." },
+                ]}
+              >
+                <InputNumber min={1} max={80} />
+              </Form.Item>
+              <Form.Item label={null}>
+                <Button type="primary" htmlType="submit">
+                  Geleverd
+                </Button>
+              </Form.Item>
+            </Form>
             <Button
               type={"default"}
               danger

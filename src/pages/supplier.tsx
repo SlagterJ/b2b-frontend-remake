@@ -24,7 +24,9 @@ const SupplierPage: FC = () => {
   const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrder[]>([]);
 
   useEffect(() => {
-    (async () => {
+    let subscription: any;
+
+    const fetchData = async () => {
       const { data, error } = await supabase
         .from("PurchaseOrders")
         .select(
@@ -56,7 +58,25 @@ const SupplierPage: FC = () => {
       );
 
       setPurchaseOrders(filteredData);
-    })();
+    };
+
+    fetchData();
+
+    subscription = supabase
+      .channel("workorders-channel")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "Orders",
+        },
+        (payload) => {
+          console.log("Realtime payload:", payload);
+          fetchData(); // refresh the list
+        },
+      )
+      .subscribe();
   });
 
   const dataSource = purchaseOrders.map((purchaseOrder) => ({

@@ -180,7 +180,7 @@ const AccountManagementPage: FC = () => {
           Afgewezen
         </Button>
       </Space>
-      <Table dataSource={filteredOrders} columns={columns} />;
+      <Table dataSource={filteredOrders} columns={columns} />
     </Content>
   );
 };

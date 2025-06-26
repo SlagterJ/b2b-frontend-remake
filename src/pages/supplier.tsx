@@ -4,7 +4,7 @@ import { Space, Typography } from "antd";
 const PurchasingPage: FC = () => {
   return (
     <Space>
-      <Typography>Hello, purchasing!</Typography>
+      <Typography>Hello, supplier!</Typography>
     </Space>
   );
 };

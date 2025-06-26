@@ -49,9 +49,9 @@ const MyApp: FC<AppProps> = ({ Component, pageProps }: AppProps) => {
       label: "Planning",
     },
     {
-      key: "purchasing",
+      key: "supplier",
       icon: <FundViewOutlined />,
-      label: "Inkoop",
+      label: "Leverancier",
     },
     {
       key: "inventorymanagement",

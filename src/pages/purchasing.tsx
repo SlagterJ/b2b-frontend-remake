@@ -7,6 +7,7 @@ interface WorkOrder {
   id: string;
   Orders: {
     id: string;
+    productQuantity: number;
     Products: {
       blueBlocks: number;
       redBlocks: number;
@@ -74,27 +75,37 @@ const PurchasingPage: FC = () => {
       .subscribe();
   });
 
-  const dataSource = workOrders.map((purchaseOrder) => ({
-    key: purchaseOrder.id,
-    blueBlocks: purchaseOrder.Orders.Products.blueBlocks,
-    redBlocks: purchaseOrder.Orders.Products.redBlocks,
-    greyBlocks: purchaseOrder.Orders.Products.greyBlocks,
-    productionLineName: purchaseOrder.ProductionLines.name,
-  }));
+  const dataSource = workOrders.map((purchaseOrder) => {
+    const quantity: number = purchaseOrder.Orders.productQuantity;
+
+    return {
+      key: purchaseOrder.id,
+      quantity: quantity,
+      blueBlocks: purchaseOrder.Orders.Products.blueBlocks * quantity,
+      redBlocks: purchaseOrder.Orders.Products.redBlocks * quantity,
+      greyBlocks: purchaseOrder.Orders.Products.greyBlocks * quantity,
+      productionLineName: purchaseOrder.ProductionLines.name,
+    };
+  });
 
   const columns = [
     {
-      title: "Blauwe blokken",
+      title: "Aantal",
+      dataIndex: "quantity",
+      key: "quantity",
+    },
+    {
+      title: "Blauwe blokken x aantal",
       dataIndex: "blueBlocks",
       key: "blueBlocks",
     },
     {
-      title: "Rode blokken",
+      title: "Rode blokken x aantal",
       dataIndex: "redBlocks",
       key: "redBlocks",
     },
     {
-      title: "Grijze blokken",
+      title: "Grijze blokken x aantal",
       dataIndex: "greyBlocks",
       key: "greyBlocks",
     },

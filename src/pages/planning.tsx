@@ -134,15 +134,6 @@ const PlanningPage: FC = () => {
         console.error("Data length is", data.length);
         return;
       }
-
-      const { error: purchaseOrderError } = await supabase
-        .from("PurchaseOrders")
-        .insert([{ orderPeriod: values.period, workOrderId: data[0].id }]);
-
-      if (purchaseOrderError) {
-        console.error(purchaseOrderError);
-        return;
-      }
     })();
 
     console.table(values);

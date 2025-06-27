@@ -14,7 +14,7 @@ import {
 import { supabase } from "../global/initSupabase";
 import { Content } from "antd/es/layout/layout";
 
-const PlanningPage: FC = () => {
+const PurchasingPage: FC = () => {
   const [form] = Form.useForm();
   const [orders, setOrders] = useState<any[] | undefined>(undefined);
   const [statusFilter, setStatusFilter] = useState<string>("Planning");
@@ -30,7 +30,10 @@ const PlanningPage: FC = () => {
     let subscription: any;
 
     const fetchOrders = async () => {
-      const { data } = await supabase.from("Orders").select();
+      const { data } = await supabase
+        .from("Orders")
+        .select()
+        .eq("status", "WaitingForPurchasing");
       const orderData: any[] = [];
 
       const { data: customersData } = await supabase
@@ -102,7 +105,7 @@ const PlanningPage: FC = () => {
       const { error: updateOrderError } = await supabase
         .from("Orders")
         .update({
-          status: "WaitingForPurchasing",
+          status: "WaitingForParts",
         })
         .eq("id", selectedOrder.key);
 
@@ -195,7 +198,7 @@ const PlanningPage: FC = () => {
               type={isPlanning ? "primary" : "default"}
               onClick={() => showModal(record)}
             >
-              Plannen
+              Accepteren
             </Button>
           </Space>
         );
@@ -294,4 +297,4 @@ const PlanningPage: FC = () => {
   );
 };
 
-export default PlanningPage;
+export default PurchasingPage;

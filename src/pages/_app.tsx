@@ -10,6 +10,7 @@ import {
   AuditOutlined,
   BuildOutlined,
   CalendarOutlined,
+  EuroCircleOutlined,
   MonitorOutlined,
   TeamOutlined,
   TruckOutlined,
@@ -41,6 +42,11 @@ const MyApp: FC<AppProps> = ({ Component, pageProps }: AppProps) => {
       key: "planning",
       icon: <CalendarOutlined />,
       label: "Planning",
+    },
+    {
+      key: "purchasing",
+      icon: <EuroCircleOutlined />,
+      label: "Inkoop",
     },
     {
       key: "supplier",

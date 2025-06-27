@@ -43,7 +43,8 @@ const PurchasingPage: FC = () => {
           )
       `,
         )
-        .filter("Orders.status", "eq", "WaitingForPurchasing");
+        .filter("Orders.status", "eq", "WaitingForPurchasing")
+        .order("createdAt", { ascending: true });
 
       if (error) {
         console.error("There was an error retrieving purchase orders", error);

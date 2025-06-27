@@ -117,7 +117,8 @@ const ProductionLineView: FC<ProductionLineViewProps> = ({
       `,
         )
         .eq("productionLineId", selectedProductionLineId)
-        .filter("Orders.status", "eq", "InProduction");
+        .filter("Orders.status", "eq", "InProduction")
+        .order("createdAt", { ascending: true });
 
       if (error) {
         console.error("Could not retrieve orders", error);

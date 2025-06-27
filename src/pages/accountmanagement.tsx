@@ -11,7 +11,11 @@ const AccountManagementPage: FC = () => {
     let subscription: any;
 
     const fetchOrders = async () => {
-      const { data } = await supabase.from("Orders").select();
+      const { data } = await supabase
+        .from("Orders")
+        .select()
+        .order("createdAt", { ascending: true }); // sort newest first
+
       const orderData: any[] = [];
 
       const { data: customersData } = await supabase

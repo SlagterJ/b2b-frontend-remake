@@ -47,7 +47,8 @@ const SupplierPage: FC = () => {
         )
       `,
         )
-        .filter("WorkOrders.Orders.status", "eq", "WaitingForParts");
+        .filter("WorkOrders.Orders.status", "eq", "WaitingForParts")
+        .order("createdAt", { ascending: true });
 
       if (error) {
         console.error("There was an error retrieving purchase orders", error);

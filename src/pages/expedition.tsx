@@ -42,7 +42,8 @@ const ExpeditionPage: FC = () => {
         )
       `,
         )
-        .filter("Orders.status", "eq", "ReadyForDelivery");
+        .filter("Orders.status", "eq", "ReadyForDelivery")
+        .order("createdAt", { ascending: true });
 
       if (error) {
         console.error("Could not retrieve orders", error);

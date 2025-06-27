@@ -41,7 +41,10 @@ const PlanningPage: FC = () => {
     let subscription: any;
 
     const fetchOrders = async () => {
-      const { data } = await supabase.from("Orders").select();
+      const { data } = await supabase
+        .from("Orders")
+        .select()
+        .order("createdAt", { ascending: true });
       const orderData: any[] = [];
 
       const { data: customersData } = await supabase

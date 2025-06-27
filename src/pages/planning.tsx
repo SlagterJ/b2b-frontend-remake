@@ -14,6 +14,16 @@ import {
 import { supabase } from "../global/initSupabase";
 import { Content } from "antd/es/layout/layout";
 
+interface WorkOrder {
+  id: number;
+  productionLineId: string;
+  Orders: {
+    id: number;
+    productQuantity: number;
+    status: string;
+  };
+}
+
 const PlanningPage: FC = () => {
   const [form] = Form.useForm();
   const [orders, setOrders] = useState<any[] | undefined>(undefined);
@@ -25,6 +35,7 @@ const PlanningPage: FC = () => {
   const [selectedProductionLineId, setSelectedProductionLineId] = useState<
     string | null
   >();
+  const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
 
   useEffect(() => {
     let subscription: any;
@@ -57,6 +68,34 @@ const PlanningPage: FC = () => {
       });
 
       setOrders(orderData);
+
+      const fetchProductionLines = async () => {
+        const { data, error } = await supabase.from("WorkOrders").select(
+          `
+        *,
+        Orders(
+          *
+        )
+      `,
+        );
+
+        if (error) {
+          console.error("Could not retrieve orders", error);
+          return;
+        }
+
+        const filteredData = (data as unknown as WorkOrder[]).filter(
+          (workOrder) =>
+            workOrder.Orders !== null &&
+            (workOrder.Orders.status === "InProduction" ||
+              workOrder.Orders.status === "WaitingForParts" ||
+              workOrder.Orders.status === "WaitingForPurchasing"),
+        );
+
+        setWorkOrders(filteredData);
+      };
+
+      fetchProductionLines();
     };
 
     fetchOrders(); // Initial fetch
@@ -194,6 +233,19 @@ const PlanningPage: FC = () => {
     },
   ];
 
+  const getProductionBacklog = (productionLineId: string): number => {
+    let total = 0;
+    const filteredWorkOrders = workOrders.filter(
+      (workOrder) => workOrder.productionLineId === productionLineId,
+    );
+
+    filteredWorkOrders.forEach((workOrder) => {
+      total += workOrder.Orders.productQuantity;
+    });
+
+    return total;
+  };
+
   const handleMenuClick: MenuProps["onClick"] = (info) => {
     setSelectedProductionLineId(info.key);
     form.setFieldsValue({ productionLine: info.key });
@@ -202,7 +254,10 @@ const PlanningPage: FC = () => {
   const menuItems: MenuProps["items"] = productionLines.map(
     (productionLine) => ({
       key: productionLine.id,
-      label: productionLine.name,
+      label:
+        productionLine.name +
+        " Backlog: " +
+        getProductionBacklog(productionLine.id),
     }),
   );
 

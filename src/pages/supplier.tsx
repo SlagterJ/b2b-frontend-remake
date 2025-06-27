@@ -8,6 +8,7 @@ interface PurchaseOrder {
   WorkOrders: {
     Orders: {
       id: string;
+      productQuantity: number;
       Products: {
         blueBlocks: number;
         redBlocks: number;
@@ -79,13 +80,19 @@ const SupplierPage: FC = () => {
       .subscribe();
   });
 
-  const dataSource = purchaseOrders.map((purchaseOrder) => ({
-    key: purchaseOrder.id,
-    blueBlocks: purchaseOrder.WorkOrders.Orders.Products.blueBlocks,
-    redBlocks: purchaseOrder.WorkOrders.Orders.Products.redBlocks,
-    greyBlocks: purchaseOrder.WorkOrders.Orders.Products.greyBlocks,
-    productionLineName: purchaseOrder.WorkOrders.ProductionLines.name,
-  }));
+  const dataSource = purchaseOrders.map((purchaseOrder) => {
+    const quantity = purchaseOrder.WorkOrders.Orders.productQuantity;
+
+    return {
+      key: purchaseOrder.id,
+      blueBlocks:
+        purchaseOrder.WorkOrders.Orders.Products.blueBlocks * quantity,
+      redBlocks: purchaseOrder.WorkOrders.Orders.Products.redBlocks * quantity,
+      greyBlocks:
+        purchaseOrder.WorkOrders.Orders.Products.greyBlocks * quantity,
+      productionLineName: purchaseOrder.WorkOrders.ProductionLines.name,
+    };
+  });
 
   const columns = [
     {

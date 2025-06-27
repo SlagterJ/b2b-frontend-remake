@@ -4,6 +4,7 @@ import { Content } from "antd/es/layout/layout";
 import { supabase } from "../global/initSupabase";
 
 interface Order {
+  status: string;
   productQuantity: number;
   Products: {
     blueBlocks: number;
@@ -54,8 +55,7 @@ const HomePage: FC = () => {
 
       const { data: totalBlocks, error: totalBlocksError } = await supabase
         .from("Orders")
-        .select("*, Products(*)")
-        .eq("status", "Delivered");
+        .select("*, Products(*)");
 
       if (totalBlocksError) {
         console.error(
@@ -65,7 +65,14 @@ const HomePage: FC = () => {
         return;
       }
 
-      const totals = (totalBlocks as Order[]).reduce(
+      const totalBlocksFiltered = (totalBlocks as Order[]).filter(
+        (order) =>
+          order.status === "InProduction" ||
+          order.status === "ReadyForDelivery" ||
+          order.status === "Delivered",
+      );
+
+      const totals = totalBlocksFiltered.reduce(
         (acc, order) => {
           acc.blue +=
             (order.productQuantity || 0) * (order.Products?.blueBlocks || 0);
@@ -97,7 +104,7 @@ const HomePage: FC = () => {
         </Col>
         <Col span={6}>
           <Statistic
-            title="Aantal blokjes geleverd totaal"
+            title="Aantal blokjes geleverd aan ons totaal"
             value={totalBlocks}
           />
         </Col>

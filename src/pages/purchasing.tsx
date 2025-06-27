@@ -9,6 +9,7 @@ interface WorkOrder {
     id: string;
     productQuantity: number;
     Products: {
+      productName: string;
       blueBlocks: number;
       redBlocks: number;
       greyBlocks: number;
@@ -81,6 +82,7 @@ const PurchasingPage: FC = () => {
     return {
       key: purchaseOrder.id,
       quantity: quantity,
+      productName: purchaseOrder.Orders.Products.productName,
       blueBlocks: purchaseOrder.Orders.Products.blueBlocks * quantity,
       redBlocks: purchaseOrder.Orders.Products.redBlocks * quantity,
       greyBlocks: purchaseOrder.Orders.Products.greyBlocks * quantity,
@@ -89,6 +91,11 @@ const PurchasingPage: FC = () => {
   });
 
   const columns = [
+    {
+      title: "Type",
+      dataIndex: "productName",
+      key: "productName",
+    },
     {
       title: "Aantal",
       dataIndex: "quantity",

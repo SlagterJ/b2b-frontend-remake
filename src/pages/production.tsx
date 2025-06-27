@@ -154,15 +154,25 @@ const ProductionLineView: FC<ProductionLineViewProps> = ({
     };
   }, [selectedProductionLineId]);
 
-  const dataSource = workOrders.map((workOrder) => ({
-    key: workOrder.id,
-    productName: workOrder.Orders.Products.productName,
-    productQuantity: workOrder.Orders.productQuantity,
-    blueBlocks: workOrder.Orders.Products.blueBlocks,
-    redBlocks: workOrder.Orders.Products.redBlocks,
-    greyBlocks: workOrder.Orders.Products.greyBlocks,
-    orderId: workOrder.Orders.id,
-  }));
+  const dataSource = workOrders.map((workOrder) => {
+    const quantity = workOrder.Orders.productQuantity;
+    const blueBlocks = workOrder.Orders.Products.blueBlocks;
+    const blueBlocksTotal = blueBlocks * quantity;
+    const redBlocks = workOrder.Orders.Products.redBlocks;
+    const redBlocksTotal = redBlocks * quantity;
+    const greyBlocks = workOrder.Orders.Products.greyBlocks;
+    const greyBlocksTotal = greyBlocks * quantity;
+
+    return {
+      key: workOrder.id,
+      productName: workOrder.Orders.Products.productName,
+      productQuantity: quantity,
+      blueBlocks: `P.P.: ${blueBlocks} | T: ${blueBlocksTotal}`,
+      redBlocks: `P.P.: ${redBlocks} | T: ${redBlocksTotal}`,
+      greyBlocks: `P.P.: ${greyBlocks} | T: ${greyBlocksTotal}`,
+      orderId: workOrder.Orders.id,
+    };
+  });
 
   const handleStatusUpdate = async (
     orderId: string,

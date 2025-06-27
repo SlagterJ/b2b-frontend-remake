@@ -17,6 +17,7 @@ const HomePage: FC = () => {
   const [totalOrders, setTotalOrders] = useState(0);
   const [totalOrdersFinished, setTotalOrdersFinished] = useState(0);
   const [totalBlocks, setTotalBlocks] = useState(0);
+  const [totalProducts, setTotalProducts] = useState(0);
 
   useEffect(() => {
     (async () => {
@@ -86,6 +87,22 @@ const HomePage: FC = () => {
       );
 
       setTotalBlocks(totals.blue + totals.red + totals.grey);
+
+      const { data, error } = await supabase
+        .from("Orders")
+        .select("productQuantity")
+        .eq("status", "Delivered");
+
+      if (error) {
+        console.error("Error fetching data:", error);
+      } else {
+        const total = data.reduce(
+          (sum, order) => sum + (order.productQuantity || 0),
+          0,
+        );
+        console.log("Total Delivered Quantity:", total);
+        setTotalProducts(total);
+      }
     })();
   }, []);
 
@@ -101,6 +118,9 @@ const HomePage: FC = () => {
             title="Aantal orders succesvol geleverd"
             value={totalOrdersFinished}
           />
+        </Col>
+        <Col span={6}>
+          <Statistic title="Aantal producten geleverd" value={totalProducts} />
         </Col>
         <Col span={6}>
           <Statistic

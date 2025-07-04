@@ -2,6 +2,7 @@
 import { createBackendRoute } from "../global/env";
 
 export interface CreateOrderProperties {
+  quantity: number;
   customerId: number;
   productId: number;
   status: string;
@@ -21,8 +22,13 @@ export class OrderController {
   }
 
   public static async create(order: CreateOrderProperties): Promise<Order> {
+    console.log("create order called!");
+    console.table(order);
+    console.log(JSON.stringify(order));
+
     const response = await fetch(createBackendRoute("Orders"), {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(order),
     });
 
@@ -38,6 +44,7 @@ export class OrderController {
 
     await fetch(createBackendRoute(["Orders", id.toString()]), {
       method: "PUT",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(orderJSON),
     });
 

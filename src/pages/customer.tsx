@@ -7,6 +7,7 @@ import {
   Form,
   InputNumber,
   MenuProps,
+  Skeleton,
   Typography,
 } from "antd";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -15,7 +16,6 @@ import { Customer } from "../models/customer.model";
 import { Product } from "../models/product.model";
 import { ProductController } from "../controllers/product.controller";
 import { OrderController } from "../controllers/order.controller";
-import { queryClient } from "./_app";
 
 interface OrderFormProps {
   customerId: number;
@@ -35,9 +35,6 @@ const OrderForm: FC<OrderFormProps> = ({ customerId }) => {
 
   const mutation = useMutation({
     mutationFn: OrderController.create,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["products"] });
-    },
   });
 
   const handleMenuClick: MenuProps["onClick"] = (info) => {
@@ -58,7 +55,22 @@ const OrderForm: FC<OrderFormProps> = ({ customerId }) => {
     (product) => product.id === selectedProductId,
   );
 
-  const handleSubmit = (values: any) => {};
+  const handleSubmit = (values: any) => {
+    mutation.mutate({
+      quantity: values.quantity,
+      status: "PendingApproval",
+      customerId: customerId,
+      productId: selectedProductId!,
+    });
+  };
+
+  if (isPending) return <Skeleton />;
+  if (error)
+    return (
+      <Typography>
+        Er was een fout bij het ophalen van de productdata.
+      </Typography>
+    );
 
   return (
     <Form form={form} onFinish={handleSubmit}>
@@ -86,15 +98,6 @@ const OrderForm: FC<OrderFormProps> = ({ customerId }) => {
         rules={[{ required: true, message: "Vul a.u.b. het aantal in" }]}
       >
         <InputNumber min={1} max={3} />
-      </Form.Item>
-      <Form.Item
-        label="Periode"
-        name="period"
-        rules={[
-          { required: true, message: "Vul a.u.b. de huidige periode in" },
-        ]}
-      >
-        <InputNumber min={1} max={80} />
       </Form.Item>
 
       <Form.Item label={null}>
@@ -134,6 +137,14 @@ const CustomerPage: FC = () => {
   const selectedCustomer = customers.find(
     (customer) => customer.id === selectedCustomerId,
   );
+
+  if (isPending) return <Skeleton />;
+  if (error)
+    return (
+      <Typography>
+        Er was een fout bij het ophalen van de klantendata.
+      </Typography>
+    );
 
   return (
     <>

@@ -1,7 +1,7 @@
 ﻿import { Order } from "../models/order.model";
 import { createBackendRoute } from "../global/env";
 
-export class CustomerController {
+export class OrderController {
   public static async readAll(): Promise<Order[]> {
     const response = await fetch(createBackendRoute("Orders"));
     const data = await response.json();

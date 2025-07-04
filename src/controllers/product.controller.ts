@@ -1,7 +1,7 @@
 import { Product } from "../models/product.model";
 import { createBackendRoute } from "../global/env";
 
-export class CustomerController {
+export class ProductController {
   public static async readAll(): Promise<Product[]> {
     const response = await fetch(createBackendRoute("Products"));
     const data = await response.json();

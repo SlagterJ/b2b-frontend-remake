@@ -9,37 +9,36 @@ import {
   MenuProps,
   Typography,
 } from "antd";
-
-interface Customer {
-  id: string;
-  name: string;
-}
-
-interface Product {
-  id: string;
-  productName: string;
-}
+import { useQuery } from "@tanstack/react-query";
+import { CustomerController } from "../controllers/customer.controller";
+import { Customer } from "../models/customer.model";
+import { Product } from "../models/product.model";
+import { ProductController } from "../controllers/product.controller";
 
 interface OrderFormProps {
-  customerId: string;
+  customerId: number;
 }
 
 const OrderForm: FC<OrderFormProps> = ({ customerId }) => {
   const [form] = Form.useForm();
   const [products, setProducts] = useState<Product[]>([]);
-  const [selectedProductId, setSelectedProductId] = useState<string | null>(
+  const [selectedProductId, setSelectedProductId] = useState<number | null>(
     null,
   );
-  useEffect(() => {}, []);
+  const { isPending, error, data } = useQuery({
+    queryKey: ["products"],
+    queryFn: ProductController.readAll,
+  });
+  useEffect(() => setProducts(data || []), [data]);
 
   const handleMenuClick: MenuProps["onClick"] = (info) => {
-    setSelectedProductId(info.key);
+    setSelectedProductId(Number(info.key));
     form.setFieldsValue({ product: info.key });
   };
 
   const menuItems: MenuProps["items"] = products.map((product) => ({
     key: product.id, // this is the customer ID
-    label: product.productName,
+    label: product.name,
   }));
 
   const selectedProduct = products.find(
@@ -79,7 +78,7 @@ const OrderForm: FC<OrderFormProps> = ({ customerId }) => {
         >
           <Button>
             {selectedProduct
-              ? selectedProduct.productName
+              ? selectedProduct.name
               : "Kies uw gewenste product ↓"}
           </Button>
         </Dropdown>
@@ -112,13 +111,18 @@ const OrderForm: FC<OrderFormProps> = ({ customerId }) => {
 
 const CustomerPage: FC = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(
+  const { isPending, error, data } = useQuery({
+    queryKey: ["customers"],
+    queryFn: CustomerController.readAll,
+  });
+  useEffect(() => setCustomers(data || []), [data]);
+
+  const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(
     null,
   );
-  useEffect(() => {}, []);
 
   const handleMenuClick: MenuProps["onClick"] = (info) => {
-    setSelectedCustomerId(info.key);
+    setSelectedCustomerId(Number(info.key));
   };
 
   const menuItems: MenuProps["items"] = customers.map((customer) => ({

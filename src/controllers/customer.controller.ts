@@ -2,13 +2,13 @@
 import { createBackendRoute } from "../global/env";
 
 export class CustomerController {
-  static async readAll(): Promise<Customer[]> {
+  public static async readAll(): Promise<Customer[]> {
     const response = await fetch(createBackendRoute("Customers"));
     const data = await response.json();
     return data.map((item: any) => Customer.fromJSON(item));
   }
 
-  static async readOneById(id: number): Promise<Customer> {
+  public static async readOneById(id: number): Promise<Customer> {
     const response = await fetch(
       createBackendRoute(["Customers", id.toString()]),
     );
@@ -16,7 +16,7 @@ export class CustomerController {
     return data.map((item: any) => Customer.fromJSON(item));
   }
 
-  static async create(customer: Customer): Promise<Customer> {
+  public static async create(customer: Customer): Promise<Customer> {
     const customerJSON = customer.toJSON();
 
     await fetch(createBackendRoute("Customers"), {
@@ -27,7 +27,7 @@ export class CustomerController {
     return customer;
   }
 
-  static async update(customer: Customer): Promise<Customer> {
+  public static async update(customer: Customer): Promise<Customer> {
     const id = customer.id;
 
     const customerJSON = customer.toJSON();
@@ -40,7 +40,7 @@ export class CustomerController {
     return customer;
   }
 
-  static async delete(customer: Customer): Promise<Customer> {
+  public static async delete(customer: Customer): Promise<Customer> {
     const id = customer.id;
     await fetch(createBackendRoute(["Customers", id.toString()]), {
       method: "DELETE",

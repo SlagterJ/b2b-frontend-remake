@@ -8,7 +8,6 @@ import {
   Table,
   Typography,
 } from "antd";
-import { supabase } from "../global/initSupabase";
 import { Content } from "antd/es/layout/layout";
 
 interface ProductionLine {
@@ -22,18 +21,7 @@ const ProductionPage: FC = () => {
     string | null
   >(null);
 
-  useEffect(() => {
-    (async () => {
-      const { data, error } = await supabase.from("ProductionLines").select();
-
-      if (error) {
-        console.error("Failed to load production lines", error);
-        return;
-      }
-
-      setProductionLines(data as ProductionLine[]);
-    })();
-  }, []);
+  useEffect(() => {}, []);
 
   const handleMenuClick: MenuProps["onClick"] = (info) => {
     setSelectedProductionLineId(info.key);
@@ -99,61 +87,7 @@ const ProductionLineView: FC<ProductionLineViewProps> = ({
 }) => {
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
 
-  useEffect(() => {
-    let subscription: any;
-
-    const fetchData = async () => {
-      const { data, error } = await supabase
-        .from("WorkOrders")
-        .select(
-          `
-        *,
-        Orders(
-          *,
-          Products (
-            *
-          )
-        )
-      `,
-        )
-        .eq("productionLineId", selectedProductionLineId)
-        .filter("Orders.status", "eq", "InProduction")
-        .order("createdAt", { ascending: true });
-
-      if (error) {
-        console.error("Could not retrieve orders", error);
-        return;
-      }
-
-      const filteredData = (data as WorkOrder[]).filter(
-        (workOrder) => workOrder.Orders !== null,
-      );
-
-      setWorkOrders(filteredData);
-    };
-
-    fetchData();
-
-    subscription = supabase
-      .channel("workorders-channel")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "Orders",
-        },
-        (payload) => {
-          console.log("Realtime payload:", payload);
-          fetchData(); // refresh the list
-        },
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(subscription);
-    };
-  }, [selectedProductionLineId]);
+  useEffect(() => {}, [selectedProductionLineId]);
 
   const dataSource = workOrders.map((workOrder) => {
     const quantity = workOrder.Orders.productQuantity;
@@ -180,7 +114,7 @@ const ProductionLineView: FC<ProductionLineViewProps> = ({
     currentStatus: string,
     selectedStatus: string,
   ) => {
-    const { error } = await supabase
+    /*const { error } = await supabase
       .from("Orders")
       .update({ status: selectedStatus })
       .eq("id", orderId);
@@ -188,7 +122,7 @@ const ProductionLineView: FC<ProductionLineViewProps> = ({
     if (error) {
       console.error("Failed to update status:", error);
       return;
-    }
+    }*/
   };
 
   const columns = [

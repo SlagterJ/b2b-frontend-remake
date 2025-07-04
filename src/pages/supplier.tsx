@@ -1,7 +1,6 @@
 ﻿import { FC, useEffect, useState } from "react";
 import { Button, Form, InputNumber, Space, Table } from "antd";
 import { Content } from "antd/es/layout/layout";
-import { supabase } from "../global/initSupabase";
 
 interface PurchaseOrder {
   id: string;
@@ -24,62 +23,7 @@ interface PurchaseOrder {
 const SupplierPage: FC = () => {
   const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrder[]>([]);
 
-  useEffect(() => {
-    let subscription: any;
-
-    const fetchData = async () => {
-      const { data, error } = await supabase
-        .from("PurchaseOrders")
-        .select(
-          `
-        *,
-        WorkOrders(
-          *,
-          Orders(
-            *,
-            Products(
-              *
-            )
-          ),
-          ProductionLines(
-            *
-          )
-        )
-      `,
-        )
-        .filter("WorkOrders.Orders.status", "eq", "WaitingForParts")
-        .order("createdAt", { ascending: true });
-
-      if (error) {
-        console.error("There was an error retrieving purchase orders", error);
-        return;
-      }
-
-      const filteredData = (data as PurchaseOrder[]).filter(
-        (purchaseOrder) => purchaseOrder.WorkOrders.Orders !== null,
-      );
-
-      setPurchaseOrders(filteredData);
-    };
-
-    fetchData();
-
-    subscription = supabase
-      .channel("workorders-channel")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "Orders",
-        },
-        (payload) => {
-          console.log("Realtime payload:", payload);
-          fetchData(); // refresh the list
-        },
-      )
-      .subscribe();
-  });
+  useEffect(() => {});
 
   const dataSource = purchaseOrders.map((purchaseOrder) => {
     const quantity = purchaseOrder.WorkOrders.Orders.productQuantity;
@@ -121,7 +65,7 @@ const SupplierPage: FC = () => {
       key: "actions",
       render: (_: any, record: any) => {
         const handleSubmit = (values: any) => {
-          (async () => {
+          /*(async () => {
             const { error: purchaseOrderError } = await supabase
               .from("PurchaseOrders")
               .update({ deliveredPeriod: values.period })
@@ -180,7 +124,7 @@ const SupplierPage: FC = () => {
               );
               return;
             }
-          })();
+          })();*/
         };
 
         return (

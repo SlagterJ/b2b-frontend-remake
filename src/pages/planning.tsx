@@ -11,7 +11,6 @@ import {
   Table,
   Typography,
 } from "antd";
-import { supabase } from "../global/initSupabase";
 import { Content } from "antd/es/layout/layout";
 
 interface WorkOrder {
@@ -37,91 +36,7 @@ const PlanningPage: FC = () => {
   >();
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
 
-  useEffect(() => {
-    let subscription: any;
-
-    const fetchOrders = async () => {
-      const { data } = await supabase
-        .from("Orders")
-        .select()
-        .order("createdAt", { ascending: true });
-      const orderData: any[] = [];
-
-      const { data: customersData } = await supabase
-        .from("Customers")
-        .select("id, name");
-      const customerMap = new Map(customersData!.map((c) => [c.id, c.name]));
-
-      const { data: productsData } = await supabase
-        .from("Products")
-        .select("id, productName");
-      const productMap = new Map(
-        productsData!.map((c) => [c.id, c.productName]),
-      );
-
-      data!.forEach((item) => {
-        orderData.push({
-          key: item.id,
-          quantity: item.productQuantity ?? "Unknown",
-          orderPeriod: item.orderPeriod ?? "Unknown",
-          customerName: customerMap.get(item.customerId) ?? "Unknown",
-          productName: productMap.get(item.productId) ?? "Unknown",
-          status: item.status ?? "Unknown",
-        });
-      });
-
-      setOrders(orderData);
-
-      const fetchProductionLines = async () => {
-        const { data, error } = await supabase.from("WorkOrders").select(
-          `
-        *,
-        Orders(
-          *
-        )
-      `,
-        );
-
-        if (error) {
-          console.error("Could not retrieve orders", error);
-          return;
-        }
-
-        const filteredData = (data as unknown as WorkOrder[]).filter(
-          (workOrder) =>
-            workOrder.Orders !== null &&
-            (workOrder.Orders.status === "InProduction" ||
-              workOrder.Orders.status === "WaitingForParts" ||
-              workOrder.Orders.status === "WaitingForPurchasing"),
-        );
-
-        setWorkOrders(filteredData);
-      };
-
-      fetchProductionLines();
-    };
-
-    fetchOrders(); // Initial fetch
-
-    subscription = supabase
-      .channel("orders-updates")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "Orders",
-        },
-        () => {
-          fetchOrders(); // Re-fetch on any insert/update/delete
-        },
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(subscription);
-    };
-  }, []);
+  useEffect(() => {}, []);
 
   const filteredOrders = orders?.filter((order) => {
     if (statusFilter === "All") return true;
@@ -132,29 +47,21 @@ const PlanningPage: FC = () => {
     setSelectedOrder(order);
     setIsModalVisible(true);
 
-    const { data, error } = await supabase
+    /*const { data, error } = await supabase
       .from("ProductionLines")
       .select("id, name");
     if (error) console.error(error);
-    else setProductionLines(data);
+    else setProductionLines(data);*/
   };
 
   const handleSubmit = (values: any) => {
     (async () => {
-      const { error: updateOrderError } = await supabase
+      /*const { error: updateOrderError } = await supabase
         .from("Orders")
         .update({
           status: "WaitingForPurchasing",
         })
         .eq("id", selectedOrder.key);
-
-      if (updateOrderError) {
-        console.error(
-          "There was a problem with updating the status of the order",
-          updateOrderError,
-        );
-        return;
-      }
 
       const { data, error: workOrderError } = await supabase
         .from("WorkOrders")
@@ -165,17 +72,11 @@ const PlanningPage: FC = () => {
             productionLineId: selectedProductionLineId,
           },
         ])
-        .select();
-
-      if (workOrderError) {
-        console.error("Error inserting work order", workOrderError);
-        return;
-      }
-
-      if (!data || data.length <= 0) {
+        .select();*/
+      /*if (!data || data.length <= 0) {
         console.error("Data length is", data.length);
         return;
-      }
+      }*/
     })();
 
     console.table(values);

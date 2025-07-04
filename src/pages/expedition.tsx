@@ -1,6 +1,5 @@
 ﻿import { FC, useEffect, useState } from "react";
 import { Button, Form, InputNumber, Space, Table, Typography } from "antd";
-import { supabase } from "../global/initSupabase";
 
 interface WorkOrder {
   id: number;
@@ -22,63 +21,7 @@ interface WorkOrder {
 const ExpeditionPage: FC = () => {
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
 
-  useEffect(() => {
-    let subscription: any;
-
-    const fetchData = async () => {
-      const { data, error } = await supabase
-        .from("WorkOrders")
-        .select(
-          `
-        *,
-        Orders(
-          *,
-          Products (
-            *
-          ),
-          Customers (
-            *
-          )
-        )
-      `,
-        )
-        .filter("Orders.status", "eq", "ReadyForDelivery")
-        .order("createdAt", { ascending: true });
-
-      if (error) {
-        console.error("Could not retrieve orders", error);
-        return;
-      }
-
-      const filteredData = (data as WorkOrder[]).filter(
-        (workOrder) => workOrder.Orders !== null,
-      );
-
-      setWorkOrders(filteredData);
-    };
-
-    fetchData();
-
-    subscription = supabase
-      .channel("workorders-channel")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "Orders",
-        },
-        (payload) => {
-          console.log("Realtime payload:", payload);
-          fetchData(); // refresh the list
-        },
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(subscription);
-    };
-  });
+  useEffect(() => {});
 
   const dataSource = workOrders.map((workOrder) => ({
     key: workOrder.id,
@@ -96,7 +39,7 @@ const ExpeditionPage: FC = () => {
     currentStatus: string,
     selectedStatus: string,
   ) => {
-    const { error } = await supabase
+    /*const { error } = await supabase
       .from("Orders")
       .update({ status: selectedStatus })
       .eq("id", orderId);
@@ -104,7 +47,7 @@ const ExpeditionPage: FC = () => {
     if (error) {
       console.error("Failed to update status:", error);
       return;
-    }
+    }*/
   };
 
   const columns = [
@@ -128,7 +71,7 @@ const ExpeditionPage: FC = () => {
       key: "actions",
       render: (_: any, record: any) => {
         const handleSubmit = (values: any) => {
-          (async () => {
+          /*(async () => {
             const { error: orderError } = await supabase
               .from("Orders")
               .update({ deliveredPeriod: values.period })
@@ -156,7 +99,7 @@ const ExpeditionPage: FC = () => {
               );
               return;
             }
-          })();
+          })();*/
         };
 
         return (

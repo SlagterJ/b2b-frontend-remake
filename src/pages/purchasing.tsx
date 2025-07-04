@@ -1,7 +1,6 @@
 ﻿import { FC, useEffect, useState } from "react";
 import { Button, Form, InputNumber, Space, Table } from "antd";
 import { Content } from "antd/es/layout/layout";
-import { supabase } from "../global/initSupabase";
 
 interface WorkOrder {
   id: string;
@@ -23,59 +22,7 @@ interface WorkOrder {
 const PurchasingPage: FC = () => {
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
 
-  useEffect(() => {
-    let subscription: any;
-
-    const fetchData = async () => {
-      const { data, error } = await supabase
-        .from("WorkOrders")
-        .select(
-          `
-        *,
-          Orders(
-            *,
-            Products(
-              *
-            )
-          ),
-          ProductionLines(
-            *
-          )
-      `,
-        )
-        .filter("Orders.status", "eq", "WaitingForPurchasing")
-        .order("createdAt", { ascending: true });
-
-      if (error) {
-        console.error("There was an error retrieving purchase orders", error);
-        return;
-      }
-
-      const filteredData = (data as WorkOrder[]).filter(
-        (purchaseOrder) => purchaseOrder.Orders !== null,
-      );
-
-      setWorkOrders(filteredData);
-    };
-
-    fetchData();
-
-    subscription = supabase
-      .channel("workorders-channel")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "Orders",
-        },
-        (payload) => {
-          console.log("Realtime payload:", payload);
-          fetchData(); // refresh the list
-        },
-      )
-      .subscribe();
-  });
+  useEffect(() => {});
 
   const dataSource = workOrders.map((purchaseOrder) => {
     const quantity: number = purchaseOrder.Orders.productQuantity;
@@ -127,7 +74,7 @@ const PurchasingPage: FC = () => {
       key: "actions",
       render: (_: any, record: any) => {
         const handleSubmit = (values: any) => {
-          (async () => {
+          /*(async () => {
             const { error } = await supabase.from("PurchaseOrders").insert({
               orderPeriod: values.period,
               workOrderId: record.key,
@@ -159,7 +106,7 @@ const PurchasingPage: FC = () => {
               );
               return;
             }
-          })();
+          })();*/
         };
 
         return (

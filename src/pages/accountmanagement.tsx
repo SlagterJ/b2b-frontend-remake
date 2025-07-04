@@ -1,71 +1,12 @@
 ﻿import { FC, useEffect, useState } from "react";
 import { Space, Typography, List, Collapse, Table, Button } from "antd";
-import { supabase } from "../global/initSupabase";
 import { Content } from "antd/lib/layout/layout";
 
 const AccountManagementPage: FC = () => {
   const [orders, setOrders] = useState<any[] | undefined>(undefined);
   const [statusFilter, setStatusFilter] = useState<string>("PendingApproval");
 
-  useEffect(() => {
-    let subscription: any;
-
-    const fetchOrders = async () => {
-      const { data } = await supabase
-        .from("Orders")
-        .select()
-        .order("createdAt", { ascending: true }); // sort newest first
-
-      const orderData: any[] = [];
-
-      const { data: customersData } = await supabase
-        .from("Customers")
-        .select("id, name");
-      const customerMap = new Map(customersData!.map((c) => [c.id, c.name]));
-
-      const { data: productsData } = await supabase
-        .from("Products")
-        .select("id, productName");
-      const productMap = new Map(
-        productsData!.map((c) => [c.id, c.productName]),
-      );
-
-      data!.forEach((item) => {
-        orderData.push({
-          key: item.id,
-          quantity: item.productQuantity ?? "Unknown",
-          orderPeriod: item.orderPeriod ?? "Unknown",
-          customerName: customerMap.get(item.customerId) ?? "Unknown",
-          productName: productMap.get(item.productId) ?? "Unknown",
-          status: item.status ?? "Unknown",
-        });
-      });
-
-      setOrders(orderData);
-    };
-
-    fetchOrders(); // initial load
-
-    subscription = supabase
-      .channel("orders-updates")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "Orders",
-        },
-        (payload) => {
-          console.log("Realtime update:", payload);
-          fetchOrders();
-        },
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(subscription);
-    };
-  }, []);
+  useEffect(() => {}, []);
 
   const filteredOrders = orders?.filter((order) => {
     if (statusFilter === "All") return true;
@@ -80,7 +21,7 @@ const AccountManagementPage: FC = () => {
     const newStatus =
       currentStatus === selectedStatus ? "PendingApproval" : selectedStatus;
 
-    const { error } = await supabase
+    /*const { error } = await supabase
       .from("Orders")
       .update({ status: newStatus })
       .eq("id", orderId);
@@ -88,7 +29,7 @@ const AccountManagementPage: FC = () => {
     if (error) {
       console.error("Failed to update status:", error);
       return;
-    }
+    }*/
 
     // Update local state
     setOrders((prev) =>

@@ -9,7 +9,6 @@ import {
   MenuProps,
   Typography,
 } from "antd";
-import { supabase } from "../global/initSupabase";
 
 interface Customer {
   id: string;
@@ -31,19 +30,7 @@ const OrderForm: FC<OrderFormProps> = ({ customerId }) => {
   const [selectedProductId, setSelectedProductId] = useState<string | null>(
     null,
   );
-  useEffect(() => {
-    (async () => {
-      const { data, error } = await supabase.from("Products").select();
-
-      if (error) {
-        console.error("Failed to load products", error);
-        return;
-      }
-
-      // Store full customer objects
-      setProducts(data as Product[]);
-    })();
-  }, []);
+  useEffect(() => {}, []);
 
   const handleMenuClick: MenuProps["onClick"] = (info) => {
     setSelectedProductId(info.key);
@@ -60,7 +47,7 @@ const OrderForm: FC<OrderFormProps> = ({ customerId }) => {
   );
 
   const handleSubmit = (values: any) => {
-    (async () => {
+    /*(async () => {
       const { error } = await supabase.from("Orders").insert([
         {
           customerId: customerId,
@@ -74,7 +61,7 @@ const OrderForm: FC<OrderFormProps> = ({ customerId }) => {
 
       form.resetFields();
       setSelectedProductId(null);
-    })();
+    })();*/
   };
 
   return (
@@ -128,19 +115,7 @@ const CustomerPage: FC = () => {
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(
     null,
   );
-  useEffect(() => {
-    (async () => {
-      const { data, error } = await supabase.from("Customers").select();
-
-      if (error) {
-        console.error("Failed to load customers", error);
-        return;
-      }
-
-      // Store full customer objects
-      setCustomers(data as Customer[]);
-    })();
-  }, []);
+  useEffect(() => {}, []);
 
   const handleMenuClick: MenuProps["onClick"] = (info) => {
     setSelectedCustomerId(info.key);

@@ -17,11 +17,11 @@ export class CustomerController {
   }
 
   public static async create(product: Product): Promise<Product> {
-    const customerJSON = product.toJSON();
+    const productJSON = product.toJSON();
 
     await fetch(createBackendRoute("Products"), {
       method: "POST",
-      body: JSON.stringify(customerJSON),
+      body: JSON.stringify(productJSON),
     });
 
     return product;
@@ -30,11 +30,11 @@ export class CustomerController {
   public static async update(product: Product): Promise<Product> {
     const id = product.id;
 
-    const customerJSON = product.toJSON();
+    const productJSON = product.toJSON();
 
     await fetch(createBackendRoute(["Products", id.toString()]), {
       method: "PUT",
-      body: JSON.stringify(customerJSON),
+      body: JSON.stringify(productJSON),
     });
 
     return product;

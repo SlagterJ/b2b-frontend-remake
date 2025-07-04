@@ -19,11 +19,11 @@ export class PurchaseOrderController {
   public static async create(
     purchaseOrders: PurchaseOrder,
   ): Promise<PurchaseOrder> {
-    const customerJSON = purchaseOrders.toJSON();
+    const purchaseOrderJSON = purchaseOrders.toJSON();
 
     await fetch(createBackendRoute("PurchaseOrders"), {
       method: "POST",
-      body: JSON.stringify(customerJSON),
+      body: JSON.stringify(purchaseOrderJSON),
     });
 
     return purchaseOrders;
@@ -34,11 +34,11 @@ export class PurchaseOrderController {
   ): Promise<PurchaseOrder> {
     const id = purchaseOrders.id;
 
-    const customerJSON = purchaseOrders.toJSON();
+    const purchaseOrderJSON = purchaseOrders.toJSON();
 
     await fetch(createBackendRoute(["PurchaseOrders", id.toString()]), {
       method: "PUT",
-      body: JSON.stringify(customerJSON),
+      body: JSON.stringify(purchaseOrderJSON),
     });
 
     return purchaseOrders;

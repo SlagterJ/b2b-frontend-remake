@@ -19,11 +19,11 @@ export class ProductionLineController {
   public static async create(
     productionLine: ProductionLine,
   ): Promise<ProductionLine> {
-    const customerJSON = productionLine.toJSON();
+    const productionLineJSON = productionLine.toJSON();
 
     await fetch(createBackendRoute("ProductionLine"), {
       method: "POST",
-      body: JSON.stringify(customerJSON),
+      body: JSON.stringify(productionLineJSON),
     });
 
     return productionLine;
@@ -34,11 +34,11 @@ export class ProductionLineController {
   ): Promise<ProductionLine> {
     const id = productionLine.id;
 
-    const customerJSON = productionLine.toJSON();
+    const productionLineJSON = productionLine.toJSON();
 
     await fetch(createBackendRoute(["ProductionLine", id.toString()]), {
       method: "PUT",
-      body: JSON.stringify(customerJSON),
+      body: JSON.stringify(productionLineJSON),
     });
 
     return productionLine;

@@ -16,6 +16,12 @@ import {
   TruckOutlined,
 } from "@ant-design/icons";
 import router from "next/router";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { QueryClient } from "@tanstack/query-core";
+
+const queryClient = new QueryClient();
+const shouldShowDevTools = true;
 
 /**
  * Default app component. This component renders and wraps around every page.
@@ -88,30 +94,33 @@ const MyApp: FC<AppProps> = ({ Component, pageProps }: AppProps) => {
 
   return (
     <Provider store={store}>
-      <App>
-        <Layout style={{ minHeight: "100vh", margin: 0 }}>
-          <Sider>
-            <Menu
-              style={{ height: "100%" }}
-              mode="inline"
-              items={menuItems}
-              onClick={handleMenuClick}
-            />
-          </Sider>
-          <Content>
-            <Layout
-              style={{
-                margin: "10px",
-                padding: "24px",
-                backgroundColor: "white",
-                borderRadius: "20px",
-              }}
-            >
-              <Component {...pageProps} />
-            </Layout>
-          </Content>
-        </Layout>
-      </App>
+      <QueryClientProvider client={queryClient}>
+        <App>
+          <Layout style={{ minHeight: "100vh", margin: 0 }}>
+            <Sider>
+              <Menu
+                style={{ height: "100%" }}
+                mode="inline"
+                items={menuItems}
+                onClick={handleMenuClick}
+              />
+            </Sider>
+            <Content>
+              <Layout
+                style={{
+                  margin: "10px",
+                  padding: "24px",
+                  backgroundColor: "white",
+                  borderRadius: "20px",
+                }}
+              >
+                <Component {...pageProps} />
+              </Layout>
+            </Content>
+          </Layout>
+        </App>
+        {shouldShowDevTools && <ReactQueryDevtools />}
+      </QueryClientProvider>
     </Provider>
   );
 };

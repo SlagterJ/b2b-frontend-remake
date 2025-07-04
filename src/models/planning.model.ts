@@ -2,7 +2,7 @@
 import { ProductionLine } from "./productionline.model";
 
 export interface PlanningProperties {
-  id: number;
+  id?: number;
   plannedDate?: Date;
   order: Order;
   productionLine: ProductionLine;

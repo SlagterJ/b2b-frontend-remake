@@ -1,5 +1,5 @@
 ﻿export interface ProductProperties {
-  id: number;
+  id?: number;
   name: string;
   price: number;
   costPrice: number;

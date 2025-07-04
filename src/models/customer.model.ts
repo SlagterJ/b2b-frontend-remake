@@ -1,7 +1,7 @@
 ﻿import { Order } from "./order.model";
 
 export interface CustomerProperties {
-  id: number;
+  id?: number;
   name: string;
   orders: Order[];
 }

@@ -9,11 +9,13 @@ import {
   MenuProps,
   Typography,
 } from "antd";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { CustomerController } from "../controllers/customer.controller";
 import { Customer } from "../models/customer.model";
 import { Product } from "../models/product.model";
 import { ProductController } from "../controllers/product.controller";
+import { OrderController } from "../controllers/order.controller";
+import { queryClient } from "./_app";
 
 interface OrderFormProps {
   customerId: number;
@@ -31,37 +33,32 @@ const OrderForm: FC<OrderFormProps> = ({ customerId }) => {
   });
   useEffect(() => setProducts(data || []), [data]);
 
+  const mutation = useMutation({
+    mutationFn: OrderController.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
+
   const handleMenuClick: MenuProps["onClick"] = (info) => {
     setSelectedProductId(Number(info.key));
     form.setFieldsValue({ product: info.key });
   };
 
-  const menuItems: MenuProps["items"] = products.map((product) => ({
-    key: product.id, // this is the customer ID
-    label: product.name,
-  }));
+  const menuItems: MenuProps["items"] = products.map((product) =>
+    product.id !== undefined
+      ? {
+          key: product.id, // this is the customer ID
+          label: product.name,
+        }
+      : null,
+  );
 
   const selectedProduct = products.find(
     (product) => product.id === selectedProductId,
   );
 
-  const handleSubmit = (values: any) => {
-    /*(async () => {
-      const { error } = await supabase.from("Orders").insert([
-        {
-          customerId: customerId,
-          productId: values.product,
-          productQuantity: values.quantity,
-          orderPeriod: values.period,
-        },
-      ]);
-
-      error && console.error(error);
-
-      form.resetFields();
-      setSelectedProductId(null);
-    })();*/
-  };
+  const handleSubmit = (values: any) => {};
 
   return (
     <Form form={form} onFinish={handleSubmit}>
@@ -125,10 +122,14 @@ const CustomerPage: FC = () => {
     setSelectedCustomerId(Number(info.key));
   };
 
-  const menuItems: MenuProps["items"] = customers.map((customer) => ({
-    key: customer.id, // this is the customer ID
-    label: customer.name,
-  }));
+  const menuItems: MenuProps["items"] = customers.map((customer) =>
+    customer.id !== undefined
+      ? {
+          key: customer.id, // this is the customer ID
+          label: customer.name,
+        }
+      : null,
+  );
 
   const selectedCustomer = customers.find(
     (customer) => customer.id === selectedCustomerId,

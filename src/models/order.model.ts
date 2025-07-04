@@ -1,5 +1,5 @@
 ﻿export interface OrderProperties {
-  id: number;
+  id?: number;
   quantity: number;
   status: string;
   orderDate: Date;

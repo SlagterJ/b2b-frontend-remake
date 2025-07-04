@@ -16,4 +16,20 @@ export class PurchaseOrder implements PurchaseOrderProperties {
     this.status = properties.status;
     this.product = properties.product;
   }
+
+  public static fromJSON(json: any): PurchaseOrder {
+    return new PurchaseOrder({
+      id: json.id,
+      status: json.status,
+      product: Product.fromJSON(json.product),
+    });
+  }
+
+  public toJSON(): any {
+    return {
+      id: this.id,
+      status: this.status,
+      product: this.product.id,
+    };
+  }
 }

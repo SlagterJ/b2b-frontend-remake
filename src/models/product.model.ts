@@ -29,4 +29,30 @@ export class Product implements ProductProperties {
     this.greyBlocks = properties.greyBlocks;
     this.productionTime = properties.productionTime;
   }
+
+  public static fromJSON(json: any): Product {
+    return new Product({
+      id: json.id,
+      name: json.name,
+      price: json.price,
+      costPrice: json.costPrice,
+      blueBlocks: json.blueBlocks,
+      redBlocks: json.redBlocks,
+      greyBlocks: json.greyBlocks,
+      productionTime: json.productionTime,
+    });
+  }
+
+  public toJSON(): any {
+    return {
+      id: this.id,
+      name: this.name,
+      price: this.price,
+      costPrice: this.costPrice,
+      blueBlocks: this.blueBlocks,
+      redBlocks: this.redBlocks,
+      greyBlocks: this.greyBlocks,
+      productionTime: this.productionTime,
+    };
+  }
 }

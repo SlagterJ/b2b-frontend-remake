@@ -1,5 +1,5 @@
 ﻿export interface ProductionLineInterface {
-  id?: number;
+  id: number;
   name: string;
   isActive: boolean;
 }

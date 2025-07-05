@@ -1,7 +1,7 @@
 ﻿import { Order } from "../models/order.model";
 import { createBackendRoute } from "../global/env";
 
-export interface CreateOrderProperties {
+export interface CreateOrderDTO {
   quantity: number;
   customerId: number;
   productId: number;
@@ -18,10 +18,10 @@ export class OrderController {
   public static async readOneById(id: number): Promise<Order> {
     const response = await fetch(createBackendRoute(["Orders", id.toString()]));
     const data = await response.json();
-    return data.map((item: any) => Order.fromJSON(item));
+    return Order.fromJSON(data);
   }
 
-  public static async create(order: CreateOrderProperties): Promise<Order> {
+  public static async create(order: CreateOrderDTO): Promise<Order> {
     console.log("create order called!");
     console.table(order);
     console.log(JSON.stringify(order));
@@ -42,22 +42,31 @@ export class OrderController {
 
     const orderJSON = order.toJSON();
 
-    await fetch(createBackendRoute(["Orders", id.toString()]), {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(orderJSON),
-    });
+    const response = await fetch(
+      createBackendRoute(["Orders", id.toString()]),
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderJSON),
+      },
+    );
 
-    return order;
+    const data = await response.json();
+
+    return Order.fromJSON(data);
   }
 
-  public static async delete(id: number): Promise<boolean> {
-    await fetch(createBackendRoute(["Orders", id.toString()]), {
-      method: "DELETE",
-    }).catch((_) => {
-      return false;
-    });
+  public static async delete(id: number): Promise<Order> {
+    const response = await fetch(
+      createBackendRoute(["Orders", id.toString()]),
+      {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      },
+    );
 
-    return true;
+    const data = response.json();
+
+    return Order.fromJSON(data);
   }
 }

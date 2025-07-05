@@ -1,6 +1,10 @@
 ﻿import { Customer } from "../models/customer.model";
 import { createBackendRoute } from "../global/env";
 
+export interface CreateCustomerDTO {
+  name: string;
+}
+
 export class CustomerController {
   public static async readAll(): Promise<Customer[]> {
     const response = await fetch(createBackendRoute("Customers"));
@@ -13,18 +17,19 @@ export class CustomerController {
       createBackendRoute(["Customers", id.toString()]),
     );
     const data = await response.json();
-    return data.map((item: any) => Customer.fromJSON(item));
+    return Customer.fromJSON(data);
   }
 
-  public static async create(customer: Customer): Promise<Customer> {
-    const customerJSON = customer.toJSON();
-
-    await fetch(createBackendRoute("Customers"), {
+  public static async create(customer: CreateCustomerDTO): Promise<Customer> {
+    const response = await fetch(createBackendRoute("Customers"), {
       method: "POST",
-      body: JSON.stringify(customerJSON),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(customer),
     });
 
-    return customer;
+    const data = await response.json();
+
+    return Customer.fromJSON(data);
   }
 
   public static async update(customer: Customer): Promise<Customer> {
@@ -32,20 +37,31 @@ export class CustomerController {
 
     const customerJSON = customer.toJSON();
 
-    await fetch(createBackendRoute(["Customers", id.toString()]), {
-      method: "PUT",
-      body: JSON.stringify(customerJSON),
-    });
+    const response = await fetch(
+      createBackendRoute(["Customers", id.toString()]),
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(customerJSON),
+      },
+    );
 
-    return customer;
+    const data = await response.json();
+
+    return Customer.fromJSON(data);
   }
 
-  public static async delete(customer: Customer): Promise<Customer> {
-    const id = customer.id;
-    await fetch(createBackendRoute(["Customers", id.toString()]), {
-      method: "DELETE",
-    });
+  public static async delete(id: number): Promise<Customer> {
+    const response = await fetch(
+      createBackendRoute(["Customers", id.toString()]),
+      {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      },
+    );
 
-    return customer;
+    const data = await response.json();
+
+    return Customer.fromJSON(data);
   }
 }

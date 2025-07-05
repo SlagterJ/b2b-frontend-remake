@@ -1,6 +1,8 @@
 import { ProductionLine } from "../models/productionline.model";
 import { createBackendRoute } from "../global/env";
 
+export interface CreateProductionLineDTO {}
+
 export class ProductionLineController {
   public static async readAll(): Promise<ProductionLine[]> {
     const response = await fetch(createBackendRoute("ProductionLine"));
@@ -13,20 +15,21 @@ export class ProductionLineController {
       createBackendRoute(["ProductionLine", id.toString()]),
     );
     const data = await response.json();
-    return data.map((item: any) => ProductionLine.fromJSON(item));
+    return ProductionLine.fromJSON(data);
   }
 
   public static async create(
-    productionLine: ProductionLine,
+    productionLine: CreateProductionLineDTO,
   ): Promise<ProductionLine> {
-    const productionLineJSON = productionLine.toJSON();
-
-    await fetch(createBackendRoute("ProductionLine"), {
+    const response = await fetch(createBackendRoute("ProductionLine"), {
       method: "POST",
-      body: JSON.stringify(productionLineJSON),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(productionLine),
     });
 
-    return productionLine;
+    const data = response.json();
+
+    return ProductionLine.fromJSON(data);
   }
 
   public static async update(
@@ -36,22 +39,31 @@ export class ProductionLineController {
 
     const productionLineJSON = productionLine.toJSON();
 
-    await fetch(createBackendRoute(["ProductionLine", id.toString()]), {
-      method: "PUT",
-      body: JSON.stringify(productionLineJSON),
-    });
+    const response = await fetch(
+      createBackendRoute(["ProductionLine", id.toString()]),
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(productionLineJSON),
+      },
+    );
 
-    return productionLine;
+    const data = await response.json();
+
+    return ProductionLine.fromJSON(data);
   }
 
-  public static async delete(
-    productionLine: ProductionLine,
-  ): Promise<ProductionLine> {
-    const id = productionLine.id;
-    await fetch(createBackendRoute(["ProductionLine", id.toString()]), {
-      method: "DELETE",
-    });
+  public static async delete(id: number): Promise<ProductionLine> {
+    const response = await fetch(
+      createBackendRoute(["ProductionLine", id.toString()]),
+      {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      },
+    );
 
-    return productionLine;
+    const data = await response.json();
+
+    return ProductionLine.fromJSON(data);
   }
 }

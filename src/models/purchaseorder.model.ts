@@ -1,7 +1,7 @@
 ﻿import { Product } from "./product.model";
 
 export interface PurchaseOrderProperties {
-  id?: number;
+  id: number;
   status: string;
   product: Product;
 }

@@ -1,6 +1,8 @@
 import { Product } from "../models/product.model";
 import { createBackendRoute } from "../global/env";
 
+export interface CreateProductDTO {}
+
 export class ProductController {
   public static async readAll(): Promise<Product[]> {
     const response = await fetch(createBackendRoute("Products"));
@@ -13,18 +15,17 @@ export class ProductController {
       createBackendRoute(["Products", id.toString()]),
     );
     const data = await response.json();
-    return data.map((item: any) => Product.fromJSON(item));
+    return Product.fromJSON(data);
   }
 
-  public static async create(product: Product): Promise<Product> {
-    const productJSON = product.toJSON();
-
+  public static async create(product: CreateProductDTO): Promise<Product> {
     await fetch(createBackendRoute("Products"), {
       method: "POST",
-      body: JSON.stringify(productJSON),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(product),
     });
 
-    return product;
+    return Product.fromJSON(product);
   }
 
   public static async update(product: Product): Promise<Product> {
@@ -32,20 +33,31 @@ export class ProductController {
 
     const productJSON = product.toJSON();
 
-    await fetch(createBackendRoute(["Products", id.toString()]), {
-      method: "PUT",
-      body: JSON.stringify(productJSON),
-    });
+    const response = await fetch(
+      createBackendRoute(["Products", id.toString()]),
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(productJSON),
+      },
+    );
 
-    return product;
+    const data = response.json();
+
+    return Product.fromJSON(product);
   }
 
-  public static async delete(product: Product): Promise<Product> {
-    const id = product.id;
-    await fetch(createBackendRoute(["Products", id.toString()]), {
-      method: "DELETE",
-    });
+  public static async delete(id: number): Promise<Product> {
+    const response = await fetch(
+      createBackendRoute(["Products", id.toString()]),
+      {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      },
+    );
 
-    return product;
+    const data = response.json();
+
+    return Product.fromJSON(data);
   }
 }

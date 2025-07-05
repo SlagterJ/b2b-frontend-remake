@@ -62,6 +62,9 @@ const OrderForm: FC<OrderFormProps> = ({ customerId }) => {
       customerId: customerId,
       productId: selectedProductId!,
     });
+
+    form.resetFields();
+    setSelectedProductId(null);
   };
 
   if (isPending) return <Skeleton />;

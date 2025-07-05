@@ -34,8 +34,8 @@ export class Planning implements PlanningProperties {
     return {
       id: this.id,
       plannedDate: this.plannedDate?.toISOString() ?? null,
-      order: this.order.id,
-      productionLine: this.productionLine.id,
+      orderId: this.order.id,
+      productionLineId: this.productionLine.id,
     };
   }
 }

@@ -1,4 +1,7 @@
-﻿export interface OrderProperties {
+﻿import { Product } from "./product.model";
+import { Customer } from "./customer.model";
+
+export interface OrderProperties {
   id: number;
   quantity: number;
   status: string;
@@ -9,6 +12,8 @@
   comment: string;
   forwardedToSupplier: boolean;
   rejectionReason: string;
+  customer: Customer;
+  product: Product;
 }
 
 export class Order implements OrderProperties {
@@ -22,6 +27,8 @@ export class Order implements OrderProperties {
   public comment;
   public forwardedToSupplier;
   public rejectionReason;
+  public customer;
+  public product;
 
   public constructor(properties: OrderProperties) {
     this.id = properties.id;
@@ -34,6 +41,8 @@ export class Order implements OrderProperties {
     this.comment = properties.comment;
     this.forwardedToSupplier = properties.forwardedToSupplier;
     this.rejectionReason = properties.rejectionReason;
+    this.customer = properties.customer;
+    this.product = properties.product;
   }
 
   public static fromJSON(json: any): Order {
@@ -50,6 +59,8 @@ export class Order implements OrderProperties {
       comment: json.comment,
       forwardedToSupplier: json.forwardedToSupplier,
       rejectionReason: json.rejectionReason,
+      customer: Customer.fromJSON(json.customer),
+      product: Product.fromJSON(json.product),
     });
   }
 
@@ -65,6 +76,8 @@ export class Order implements OrderProperties {
       comment: this.comment,
       forwardedToSupplier: this.forwardedToSupplier,
       rejectionReason: this.rejectionReason,
+      customerId: this.customer.id,
+      productId: this.product.id,
     };
   }
 }

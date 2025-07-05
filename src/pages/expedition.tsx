@@ -1,14 +1,5 @@
 ﻿import { FC, useEffect, useState } from "react";
-import {
-  Button,
-  Form,
-  Input,
-  InputNumber,
-  Skeleton,
-  Space,
-  Table,
-  Typography,
-} from "antd";
+import { Button, Form, Input, Skeleton, Space, Table, Typography } from "antd";
 import { Order } from "../models/order.model";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { OrderController } from "../controllers/order.controller";
@@ -41,7 +32,7 @@ const ExpeditionPage: FC = () => {
   });
 
   const dataSource: OrderDataDTO[] = orders
-    .filter((order) => order.status === "PendingApproval")
+    .filter((order) => order.status === "ReadyForDelivery")
     .map(
       (order): OrderDataDTO => ({
         key: order.id,

@@ -1,53 +1,80 @@
 ﻿import { FC, useEffect, useState } from "react";
-import { Button, Form, InputNumber, Space, Table, Typography } from "antd";
+import {
+  Button,
+  Form,
+  Input,
+  InputNumber,
+  Skeleton,
+  Space,
+  Table,
+  Typography,
+} from "antd";
+import { Order } from "../models/order.model";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { OrderController } from "../controllers/order.controller";
+import { queryClient } from "./_app";
 
-interface WorkOrder {
-  id: number;
-  Orders: {
-    id: number;
-    productQuantity: number;
-    Products: {
-      productName: string;
-      blueBlocks: number;
-      redBlocks: number;
-      greyBlocks: number;
-    };
-    Customers: {
-      name: string;
-    };
-  };
+interface OrderDataDTO {
+  key: number;
+  orderId: number;
+  productName: string;
+  productQuantity: number;
+  blueBlocks: number;
+  redBlocks: number;
+  greyBlocks: number;
+  customerName: string;
 }
 
 const ExpeditionPage: FC = () => {
-  const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const { isPending, error, data } = useQuery({
+    queryKey: ["expedition_orders"],
+    queryFn: OrderController.readAll,
+  });
+  useEffect(() => setOrders(data || []), [data]);
 
-  useEffect(() => {});
+  const mutation = useMutation({
+    mutationFn: OrderController.update,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["expedition_orders"] });
+    },
+  });
 
-  const dataSource = workOrders.map((workOrder) => ({
-    key: workOrder.id,
-    productName: workOrder.Orders.Products.productName,
-    productQuantity: workOrder.Orders.productQuantity,
-    blueBlocks: workOrder.Orders.Products.blueBlocks,
-    redBlocks: workOrder.Orders.Products.redBlocks,
-    greyBlocks: workOrder.Orders.Products.greyBlocks,
-    orderId: workOrder.Orders.id,
-    customerName: workOrder.Orders.Customers.name,
-  }));
+  const dataSource: OrderDataDTO[] = orders
+    .filter((order) => order.status === "PendingApproval")
+    .map(
+      (order): OrderDataDTO => ({
+        key: order.id,
+        orderId: order.id,
+        productName: order.product.name,
+        productQuantity: order.quantity,
+        blueBlocks: order.product.blueBlocks,
+        redBlocks: order.product.redBlocks,
+        greyBlocks: order.product.greyBlocks,
+        customerName: order.customer.name,
+      }),
+    );
 
-  const handleStatusUpdate = async (
-    orderId: string,
-    currentStatus: string,
-    selectedStatus: string,
-  ) => {
-    /*const { error } = await supabase
-      .from("Orders")
-      .update({ status: selectedStatus })
-      .eq("id", orderId);
+  const handleDelivered = async (orderId: number) => {
+    const order = orders.find((order) => order.id === orderId);
 
-    if (error) {
-      console.error("Failed to update status:", error);
-      return;
-    }*/
+    if (order === undefined) return;
+
+    order.status = "Delivered";
+
+    mutation.mutate(order);
+  };
+
+  const handleRejected = async (orderId: number, rejectedReason: string) => {
+    const order = orders.find((order) => order.id === orderId);
+
+    if (order === undefined) return;
+
+    order.status = "Rejected";
+    order.rejectedDate = new Date();
+    order.rejectionReason = rejectedReason;
+
+    mutation.mutate(order);
   };
 
   const columns = [
@@ -69,71 +96,49 @@ const ExpeditionPage: FC = () => {
     {
       title: "Acties",
       key: "actions",
-      render: (_: any, record: any) => {
-        const handleSubmit = (values: any) => {
-          /*(async () => {
-            const { error: orderError } = await supabase
-              .from("Orders")
-              .update({ deliveredPeriod: values.period })
-              .eq("id", record.orderId);
-
-            if (orderError) {
-              console.error(
-                "There was an error updating the order",
-                orderError,
-              );
-              return;
-            }
-
-            const { error: updateOrderError } = await supabase
-              .from("Orders")
-              .update({
-                status: "Delivered",
-              })
-              .eq("id", record.orderId);
-
-            if (updateOrderError) {
-              console.error(
-                "There was an error updating the order status",
-                updateOrderError,
-              );
-              return;
-            }
-          })();*/
-        };
-
+      render: (_: any, record: OrderDataDTO) => {
         return (
           <Space>
-            <Form onFinish={handleSubmit}>
+            <Button
+              type="primary"
+              onClick={() => handleDelivered(record.orderId)}
+            >
+              Geleverd
+            </Button>
+            <Form
+              onFinish={(values) =>
+                handleRejected(record.orderId, values["rejectedReason"])
+              }
+            >
               <Form.Item
-                label="Periode"
-                name="period"
+                label="Rede voor afwijzing"
+                name="rejectedReason"
                 rules={[
-                  { required: true, message: "Vul a.u.b de periode in." },
+                  {
+                    required: true,
+                    message: "Vul a.u.b de rede voor afwijzing in.",
+                  },
                 ]}
               >
-                <InputNumber min={1} max={80} />
+                <Input />
               </Form.Item>
               <Form.Item label={null}>
-                <Button type="primary" htmlType="submit">
-                  Geleverd
+                <Button type="default" danger htmlType="submit">
+                  Afwijzen
                 </Button>
               </Form.Item>
             </Form>
-            <Button
-              type={"default"}
-              danger
-              onClick={() =>
-                handleStatusUpdate(record.orderId, record.status, "Planning")
-              }
-            >
-              Afwijzen
-            </Button>
           </Space>
         );
       },
     },
   ];
+
+  if (isPending) return <Skeleton />;
+  if (error)
+    return (
+      <Typography>Er was een fout bij het ophalen van de gegevens.</Typography>
+    );
 
   return (
     <>
